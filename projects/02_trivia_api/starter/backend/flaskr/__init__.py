@@ -75,15 +75,20 @@ def create_app(test_config=None):
         'current_category' : None 
       })
     elif request.method == 'POST':
-      try:
-        posted_info= request.get_json()
-        posted_question = posted_info.get('question')
-        posted_answer = posted_info.get('answer')
-        posted_difficulty = posted_info.get('difficulty')
-        posted_category = posted_info.get('category')
-        print(posted_answer)
-        if (posted_question == '' or posted_answer == '' or posted_difficulty == '' or posted_category == ''):
+
+      posted_info= request.get_json()
+      if ('question' not in posted_info or 'answer' not in posted_info or 'category' not in posted_info or 'difficulty' not in posted_info):
           abort(422)
+      posted_question = posted_info.get('question')
+      posted_answer = posted_info.get('answer')
+      posted_difficulty = posted_info.get('difficulty')
+      posted_category = posted_info.get('category')
+
+      try:
+  
+  
+ 
+
         newQuestion = Question(question = posted_question,answer = posted_answer, difficulty = posted_difficulty, category = posted_category)
         newQuestion.insert()
         return jsonify({
@@ -136,6 +141,8 @@ def create_app(test_config=None):
 
     try:
       search_term = request.get_json().get('searchTerm', '')
+      if search_term == '':
+        abort()
       searchTerm= '%'+search_term+'%'
       result=Question.query.filter(Question.question.ilike(searchTerm)).all()
       formatted_result =  [q.format() for q in result]
@@ -196,7 +203,7 @@ def create_app(test_config=None):
       else:
         next_question = None
       return jsonify ({
-        'succes': True,
+        'success': True,
         'question': next_question
       })
     except:
@@ -228,7 +235,7 @@ def create_app(test_config=None):
     return jsonify({
       'success': False,
       'error': 422,
-      'message': "Can't be processed"
+      'message': "Can not be processed"
     }),422
   
   return app
