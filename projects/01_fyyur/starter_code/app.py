@@ -7,8 +7,8 @@ import dateutil.parser
 import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for
 from flask_moment import Moment
-from flask_migrate import Migrate #added by me
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
 from flask_wtf import Form
@@ -21,7 +21,7 @@ app = Flask(__name__)
 moment = Moment(app)
 app.config.from_object('config')
 db = SQLAlchemy(app)
-migrate = Migrate(app, db) #added by me
+migrate = Migrate(app, db) 
 
 # TODO: connect to a local postgresql database
 
@@ -67,16 +67,15 @@ class Artist(db.Model):
 class Show(db.Model): #added by me
     __tablename__ = 'show'
     id = db.Column(db.Integer, primary_key=True)
-    venue_name = db.Column(db.String, nullable = False )
-    artist_name = db.Column(db.String(120), nullable = False )
-    artist_id = db.Column(db.Integer, ForeignKey("Artist.id"),nullable=False)
-    venue_id = db.Column(db.Integer, ForeignKey("Venue.id"),nullable=False)
+    venue_name = db.Column(db.String, nullable = False)
+    artist_name = db.Column(db.String(120), nullable = False)
+    artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'),nullable=False)
+    venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'),nullable=False)
     start_time = db.Column(db.String(120))
     artist_image_link = db.Column(db.String(500))
     def __repr__(self):
       return f'<Show {self.id} {self.venue_name} {self.artist_name} {self.start_time} {self.artist_image_link},artist {self.artist_id}, venue {self.venue_id}  >'
-   
-db.create_all()  #added by me
+#db.create_all()  #added by me
 #----------------------------------------------------------------------------#
 # Filters.
 #----------------------------------------------------------------------------#
