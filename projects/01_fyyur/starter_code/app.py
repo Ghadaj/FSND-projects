@@ -5,7 +5,7 @@
 import json
 import dateutil.parser
 import babel
-from flask import Flask, render_template, request, Response, flash, redirect, url_for
+from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -106,28 +106,26 @@ def index():
 def venues():
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  data=[{
-    "city": "San Francisco",
-    "state": "CA",
-    "venues": [{
-      "id": 1,
-      "name": "The Musical Hop",
-      "num_upcoming_shows": 0,
-    }, {
-      "id": 3,
-      "name": "Park Square Live Music & Coffee",
-      "num_upcoming_shows": 1,
-    }]
-  }, {
-    "city": "New York",
-    "state": "NY",
-    "venues": [{
-      "id": 2,
-      "name": "The Dueling Pianos Bar",
-      "num_upcoming_shows": 0,
-    }]
-  }]
-  return render_template('pages/venues.html', areas=data);
+  venuesList = Venue.query.with_entities(Venue.city,Venue.id,Venue.name, Venue.state).order_by(Venue.city).all()
+  currentcity= venuesList[0].city
+  currentVenues = []
+  venuesArray = []
+
+  for x in venuesList:
+      if currentcity==x.city:
+        city = x.city
+        state = x.state
+        currentVenues+= [{"name" : x.name, "id" : x.id}]
+      if currentcity!=x.city:
+        venuesArray+= [{"city": city, "state": state, "venues" : currentVenues }]
+        currentVenues = []
+        currentcity = x.city
+        city = x.city
+        state = x.state
+        currentVenues += [{"name" : x.name, "id" : x.id}]
+  venuesArray+= [{"city": city, "state": state, "venues" : currentVenues }]
+
+  return render_template('pages/venues.html', areas=venuesArray)
 
 @app.route('/venues/search', methods=['POST'])
 def search_venues():
@@ -262,17 +260,8 @@ def delete_venue(venue_id):
 @app.route('/artists')
 def artists():
   # TODO: replace with real data returned from querying the database
-  data=[{
-    "id": 4,
-    "name": "Guns N Petals",
-  }, {
-    "id": 5,
-    "name": "Matt Quevedo",
-  }, {
-    "id": 6,
-    "name": "The Wild Sax Band",
-  }]
-  return render_template('pages/artists.html', artists=data)
+  artistsList = Artist.query.with_entities(Artist.id,Artist.name).all()
+  return render_template('pages/artists.html', artists=artistsList)
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
@@ -486,7 +475,9 @@ def shows():
     "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
     "start_time": "2035-04-15T20:00:00.000Z"
   }]
-  return render_template('pages/shows.html', shows=data)
+
+  showsList = Show.query.with_entities(Show.venue_id,Show.venue_name,Show.artist_id,Show.artist_name,Show.artist_image_link, Show.start_time).all()
+  return render_template('pages/shows.html', shows=showsList)
 
 @app.route('/shows/create')
 def create_shows():
