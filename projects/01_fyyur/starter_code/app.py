@@ -8,6 +8,7 @@ import babel
 from flask import Flask, render_template, request, Response, flash, redirect, url_for, jsonify
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.sql.expression import ColumnElement 
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
@@ -391,8 +392,12 @@ def shows():
   # displays list of shows at /shows
   # TODO: replace with real venues data.
   #       num_shows should be aggregated based on number of upcoming shows per venue.
-  showsList = Show.query.with_entities(Show.venue_id,Show.venue_name,Show.artist_id,Show.artist_name,Show.artist_image_link, Show.start_time).all()
-  return render_template('pages/shows.html', shows=showsList)
+
+  showsList = db.session.query(Show).join(Venue).join(Artist).all()
+  result = []
+  for row in showsList:
+    result+= [{"artist_name" : row.artist.name , "venue_name" : row.venue.name , "start_time" : row.start_time,  "artist_image_link" : row.artist.image_link , "venue_id" : row.venue.id, "artist_id" : row.artist.id}]
+  return render_template('pages/shows.html', shows=result)
 
 @app.route('/shows/create')
 def create_shows():
