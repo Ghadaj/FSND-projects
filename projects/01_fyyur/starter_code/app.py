@@ -11,8 +11,9 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
+from flask_wtf import  FlaskForm as BaseForm
 from forms import *
+
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
@@ -38,6 +39,10 @@ class Venue(db.Model):
     state = db.Column(db.String(120), nullable = False )
     address = db.Column(db.String(120))
     phone = db.Column(db.String(120))
+    genres = db.Column(db.ARRAY(db.String()))
+    website = db.Column(db.String(120))
+    seeking_talent  = db.Column(db.Boolean())
+    seeking_description = db.Column(db.String(120))
     image_link = db.Column(db.String(500))
     facebook_link = db.Column(db.String(120))
     show = db.relationship('Show', backref='venue', lazy = True)     
@@ -140,7 +145,13 @@ def search_venues():
       "num_upcoming_shows": 0,
     }]
   }
-  return render_template('pages/search_venues.html', results=response, search_term=request.form.get('search_term', ''))
+  st = "%"+request.form.get('search_term')+"%"
+  r = Venue.query.filter(Venue.name.ilike(st))
+
+  res = [{"count" : r.count(), "data" : r}]
+  for row in r:
+    print ("ID:", row.id, "Name: ",row.name, "Address:",row.address)
+  return render_template('pages/search_venues.html', results=res, search_term=request.form.get('search_term', ''))
 
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
@@ -234,13 +245,42 @@ def create_venue_form():
   form = VenueForm()
   return render_template('forms/new_venue.html', form=form)
 
-@app.route('/venues/create', methods=['POST'])
+@app.route('/venues/create', methods=['POST']) 
 def create_venue_submission():
   # TODO: insert form data as a new Venue record in the db, instead
   # TODO: modify data to be the data object returned from db insertion
+  error = False
+  venueForm = request.form
+  name = venueForm['name'] 
+  try:
+    print("inside try")
+    db.session.add(Venue(
+        city=venueForm['city'],
+        state=venueForm['state'],
+        name=name,
+        address=venueForm['address'],
+        phone=venueForm['phone'],
+        facebook_link=venueForm['facebook_link'],
+        genres=venueForm.getlist('genres'),
+        seeking_talent=False,
+        website=""
+    ))
+    db.session.commit()
+  except:
+    error = True
+    db.session.rollback()
+  finally:
+    db.session.close()
+  if error:
+   flash('An error occurred. Venue ' + name  + ' could not be listed.')
+
+  else:
+   flash('Venue ' + name + ' was successfully listed!')
+
+
 
   # on successful db insert, flash success
-  flash('Venue ' + request.form['name'] + ' was successfully listed!')
+
   # TODO: on unsuccessful db insert, flash an error instead.
   # e.g., flash('An error occurred. Venue ' + data.name + ' could not be listed.')
   # see: http://flask.pocoo.org/docs/1.0/patterns/flashing/
@@ -251,6 +291,14 @@ def delete_venue(venue_id):
   # TODO: Complete this endpoint for taking a venue_id, and using
   # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
+  try:
+    Venue.query.filter_by(id=venue_id).delete()
+    db.session.commit()
+  except:
+    db.session.rollback()
+  finally:
+    db.session.close()
+  
   # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
   # clicking that button delete it from the db then redirect the user to the homepage
   return None
