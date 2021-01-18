@@ -81,6 +81,10 @@ def create_app(test_config=None):
         posted_answer = posted_info.get('answer')
         posted_difficulty = posted_info.get('difficulty')
         posted_category = posted_info.get('category')
+        print(posted_answer)
+        if (posted_question == '' or posted_answer == '' or posted_difficulty == '' or posted_category == ''):
+          abort(422)
+        print('dht')
         newQuestion = Question(question = posted_question,answer = posted_answer, difficulty = posted_difficulty, category = posted_category)
         newQuestion.insert()
         return jsonify({
@@ -88,7 +92,7 @@ def create_app(test_config=None):
           'created' : newQuestion.id
         })
       except:
-        abort()  
+        abort(400)  
   '''
   @TODO: 
   Create an endpoint to DELETE question using a question ID. 
@@ -98,12 +102,15 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/<question_id>', methods = ['DELETE'])
   def delete_question(question_id):
-    #try:
-    Question.query.get(question_id).delete()
-    return jsonify ({
-      'success': True,
-      'deleted': question_id
-    })
+    try:
+      Question.query.get(question_id).delete()
+      return jsonify ({
+        'success': True,
+        'deleted': question_id
+      })
+
+    except:
+      abort(400)
   '''
   @TODO: 
   Create an endpoint to POST a new question, 
@@ -127,17 +134,20 @@ def create_app(test_config=None):
   '''
   @app.route('/questions/search', methods = ['POST'])
   def search_questions():
-    search_term = request.get_json().get('searchTerm', '')
-    print ('search: ' + search_term)
-    searchTerm= '%'+search_term+'%'
-    result=Question.query.filter(Question.question.ilike(searchTerm)).all()
-    formatted_result =  [q.format() for q in result]
-    return jsonify ({
-      'success' : True,
-      'questions': formatted_result,
-      'total_questions' : len(formatted_result),
-      'current_category' : None
-    })
+
+    try:
+      search_term = request.get_json().get('searchTerm', '')
+      searchTerm= '%'+search_term+'%'
+      result=Question.query.filter(Question.question.ilike(searchTerm)).all()
+      formatted_result =  [q.format() for q in result]
+      return jsonify ({
+        'success' : True,
+        'questions': formatted_result,
+        'total_questions' : len(formatted_result),
+        'current_category' : None
+      })
+    except:
+      abort(422)
   '''
   @TODO: 
   Create a GET endpoint to get questions based on category. 
@@ -148,15 +158,17 @@ def create_app(test_config=None):
   '''
   @app.route ('/categories/<category_id>/questions' , methods = ['GET'])
   def get_questions_by_category (category_id):
-    result = Question.query.filter(Question.category == category_id).all()
-    formatted_result =  [q.format() for q in result]
-  
-    return jsonify ({
-      'success': True,
-      'questions': formatted_result,
-      'totalQuestions': len(formatted_result),
-      'currentCategory': category_id
-    })
+    try:
+      result = Question.query.filter(Question.category == category_id).all()
+      formatted_result =  [q.format() for q in result]
+      return jsonify ({
+        'success': True,
+        'questions': formatted_result,
+        'totalQuestions': len(formatted_result),
+        'currentCategory': category_id
+      })
+    except:
+      abort(404)
 
   '''
   @TODO: 
@@ -169,12 +181,56 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods = ['POST'])
+  def play():
 
+    try:
+      json = request.get_json()
+      previous_questions = json.get('previous_questions')
+      quiz_category = json.get('quiz_category') 
+      if quiz_category['type'] == 'click':
+        questions = Question.query.filter(Question.id.notin_(previous_questions)).all()
+      else:
+        questions = Question.query.filter(Question.category == quiz_category['id']).filter(Question.id.notin_(previous_questions)).all()
+      if len(questions) > 0:
+        next_question = random.choice(questions).format()
+      else:
+        next_question = None
+      return jsonify ({
+        'succes': True,
+        'question': next_question
+      })
+    except:
+      abort(422)
   '''
   @TODO: 
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+
+  @app.errorhandler(400)
+  def error_400(e):
+    return jsonify({
+      'success': False,
+      'error': 400,
+      'message': "Bad Request"
+    }),400
+
+  @app.errorhandler(404)
+  def error_404(e):
+    return jsonify({
+      'success': False,
+      'error': 404,
+      'message': "Resource not found"
+    }),404
+
+  @app.errorhandler(422)
+  def error_422(e):
+    return jsonify({
+      'success': False,
+      'error': 422,
+      'message': "Can't be processed"
+    }),422
   
   return app
     

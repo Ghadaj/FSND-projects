@@ -34,7 +34,8 @@ class TriviaTestCase(unittest.TestCase):
     Write at least one test for each test for successful operation and for expected errors.
     """
 
-
+    def test_get_categories(self):
+        res = self.client().
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
