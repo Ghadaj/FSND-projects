@@ -84,7 +84,6 @@ def create_app(test_config=None):
         print(posted_answer)
         if (posted_question == '' or posted_answer == '' or posted_difficulty == '' or posted_category == ''):
           abort(422)
-        print('dht')
         newQuestion = Question(question = posted_question,answer = posted_answer, difficulty = posted_difficulty, category = posted_category)
         newQuestion.insert()
         return jsonify({

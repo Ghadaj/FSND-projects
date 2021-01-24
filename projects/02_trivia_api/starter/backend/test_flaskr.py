@@ -35,7 +35,46 @@ class TriviaTestCase(unittest.TestCase):
     """
 
     def test_get_categories(self):
-        res = self.client().
+        res = self.client().get('/categories') 
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['categories'])
+        self.assertTrue(len(data['categories']))
+
+    
+    def test_categories_not_found(self):
+        res = self.client().get('/categories/100') 
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,404)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['message'], 'Resource not found"')
+
+
+
+
+    def test_get_questions(self):
+        res = self.client().get('/questions') 
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['categories'])
+        self.assertTrue(len(data['questions']))
+
+
+    
+
+    def test_questions_not_found(self):
+        res = self.client().get('/questions/100') 
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,404)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['message'], 'Resource not found"')
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
