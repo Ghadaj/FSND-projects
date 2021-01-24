@@ -52,9 +52,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
         self.assertTrue(data['message'], 'Resource not found"')
 
-
-
-
     def test_get_questions(self):
         res = self.client().get('/questions') 
         data = json.loads(res.data)
@@ -66,15 +63,72 @@ class TriviaTestCase(unittest.TestCase):
         self.assertTrue(len(data['questions']))
 
 
-    
-
     def test_questions_not_found(self):
-        res = self.client().get('/questions/100') 
+       res = self.client().get('/questions/100') 
+       data = json.loads(res.data)
+       self.assertEqual(res.status_code,404)
+       self.assertEqual(data['success'], False)
+       self.assertTrue(data['message'], 'Resource not found')
+        
+        
+    def test_post_questions_(self):
+        res = self.client().post('/questions', json = {'question': 'test question', 'answer': 'test answer', 'category': '1', 'difficulty': '3'}) 
         data = json.loads(res.data)
 
-        self.assertEqual(res.status_code,404)
+        self.assertEqual(res.status_code,200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['created'])
+        
+        
+    def test_post_questions_error_422(self):
+        res = self.client().post('/questions', json = {'question': 'test question with no answer', 'category': '1', 'difficulty': '3'}) 
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code,422)
         self.assertEqual(data['success'], False)
-        self.assertTrue(data['message'], 'Resource not found"')
+        self.assertTrue(data['message'], "Can't be processed")
+        
+        
+    def test_delete_question(self):
+        question= Question(question = 'test question', answer= 'test answer', category = '1', difficulty = '3')
+        question.insert()
+        questionId = question.id
+        res = self.client().delete('/questions/${question_id}')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertEqual(data['deleted'], str(question_id))
+        
+        
+        
+    def test_delete_non_existing_question(self):
+        res = self.client().delete('/questions/abc')
+        data = json.loads(res.data)
+        self.assertEqual(res.status_code, 400)
+        self.assertEqual(data['success'], False)
+        self.assertEqual(data['message'],   'Bad Request')
+        
+        
+    def test_search_question(self):
+        res = self.client().post('/questions/search', json = {'searchTerm': 'where'})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
+        self.assertTrue(data['questions'])
+        self.assertTrue(data['total_questions'])
+        
+
+    def test_search_question_422(self):
+        res = self.client().post('/questions/search', json = {'searchTerm': ''})
+        data = json.loads(res.data)
+        
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
+        self.assertTrue(data['message'], "Can't be processed")
+
+        
+
 # Make the tests conveniently executable
 if __name__ == "__main__":
     unittest.main()
