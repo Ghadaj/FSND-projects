@@ -97,4 +97,79 @@ dropdb trivia_test
 createdb trivia_test
 psql trivia_test < trivia.psql
 python test_flaskr.py
+
 ```
+
+## API
+
+Get /categories, fetch all the available categories
+There are no Request parameters required
+Response:
+    Example
+    ```
+{
+  "success": True,
+  "categories": {
+    "1": "Science", 
+    "2": "Art", 
+    "3": "Geography", 
+    "4": "History", 
+    "5": "Entertainment", 
+    "6": "Sports"
+  }
+}
+
+    ```
+
+Get /questions, fetch all the available questions
+There are no Request parameters required
+Response:
+    Example
+    ```
+{'categories': {'1': 'Science', '2': 'Art', '3': 'Geography', '4': 'History', '5': 'Entertainment', '6': 'Sports'}, 'current_category': None, 'questions': [{'answer': 'Maya Angelou', 'category': 4, 'difficulty': 2, 'id': 5, 'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"}, {'answer': 'Muhammad Ali', 'category': 4, 'difficulty': 1, 'id': 9, 'question': "What boxer's original name is Cassius Clay?"}, {'answer': 'Apollo 13', 'category': 5, 'difficulty': 4, 'id': 2, 'question': 'What movie earned Tom Hanks his third straight Oscar nomination, in 1996?'}, {'answer': 'Tom Cruise', 'category': 5, 'difficulty': 4, 'id': 4, 'question': 'What actor did author Anne Rice first denounce, then praise in the role of her beloved Lestat?'}, {'answer': 'Edward Scissorhands', 'category': 5, 'difficulty': 3, 'id': 6, 'question': 'What was the title of the 1990 fantasy directed by Tim Burton about a young man with multi-bladed appendages?'}, {'answer': 'Brazil', 'category': 6, 'difficulty': 3, 'id': 10, 'question': 'Which is the only team to play in every soccer World Cup tournament?'}, {'answer': 'Uruguay', 'category': 6, 'difficulty': 4, 'id': 11, 'question': 'Which country won the first ever soccer World Cup in 1930?'}, {'answer': 'George Washington Carver', 'category': 4, 'difficulty': 2, 'id': 12, 'question': 'Who invented Peanut Butter?'}, {'answer': 'Lake Victoria', 'category': 3, 'difficulty': 2, 'id': 13, 'question': 'What is the largest lake in Africa?'}, {'answer': 'The Palace of Versailles', 'category': 3, 'difficulty': 3, 'id': 14, 'question': 'In which royal palace would you find the Hall of Mirrors?'}], 'success': True, 'total_questions': 79}
+```
+
+
+Post /questions, add a new question
+Request parameters: {question:string, answer:string, difficulty: int, category:string}
+Response:
+    Example
+    ```
+    {'success': True,
+    'created' : 30}
+        ```
+
+Delete '/questions/<question_id>, delete a question
+Request parameters: {question_id:int}
+Response:
+    Example:
+    ```
+    {
+        'success':True,
+        'deleted': 30
+    }
+    ```
+
+Post /questions/search, search for questions matches with a string matches the search term
+Request parameters: {searchTerm;string}
+Response:
+    Example:
+```
+{'current_category': None, 'questions': [{'answer': 'Maya Angelou', 'category': 4, 'difficulty': 2, 'id': 5, 'question': "Whose autobiography is entitled 'I Know Why the Caged Bird Sings'?"}], 'success': True, 'total_questions': 1}
+```
+
+Get /categories/<category_id>/questions, get all questions under specific category
+Request Parameters: {category_id:int}
+Response:
+    Example:
+    ```
+    {'currentCategory': '2', 'questions': [{'answer': 'Escher', 'category': 2, 'difficulty': 1, 'id': 16, 'question': 'Which Dutch graphic artist–initials M C was a creator of optical illusions?'}, {'answer': 'Mona Lisa', 'category': 2, 'difficulty': 3, 'id': 17, 'question': 'La Giaconda is better known as what?'}, {'answer': 'One', 'category': 2, 'difficulty': 4, 'id': 18, 'question': 'How many paintings did Van Gogh sell in his lifetime?'}, {'answer': 'Jackson Pollock', 'category': 2, 'difficulty': 2, 'id': 19, 'question': 'Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?'}], 'success': True, 'totalQuestions': 4}
+    ```
+
+Post /quizzes, fetch random questions under the selected category, one at a time.
+Request Parameters: {previous_questions:arr, quiz_category: {id:int, type:string}}}  
+Response:
+    Example:
+       ```
+{'question': {'answer': 'George Washington Carver', 'category': 4, 'difficulty': 2, 'id': 12, 'question': 'Who invented Peanut Butter?'}, 'success': True}
+    ```

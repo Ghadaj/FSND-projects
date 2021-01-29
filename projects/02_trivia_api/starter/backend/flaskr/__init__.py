@@ -86,9 +86,6 @@ def create_app(test_config=None):
 
       try:
   
-  
- 
-
         newQuestion = Question(question = posted_question,answer = posted_answer, difficulty = posted_difficulty, category = posted_category)
         newQuestion.insert()
         return jsonify({
