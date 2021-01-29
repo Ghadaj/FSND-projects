@@ -102,8 +102,8 @@ python test_flaskr.py
 
 ## API
 
-Get /categories, fetch all the available categories
-There are no Request parameters required \n
+Get /categories, fetch all the available categories.
+There are no Request parameters required.
 Response:
     Example
 ```
