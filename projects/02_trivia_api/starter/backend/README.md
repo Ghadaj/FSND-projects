@@ -123,6 +123,7 @@ Response:
  ```
 
 Get /questions, fetch all the available questions
+
 There are no Request parameters required
 Response:
     Example:
