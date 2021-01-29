@@ -103,7 +103,7 @@ python test_flaskr.py
 ## API
 
 Get /categories, fetch all the available categories
-There are no Request parameters required ...
+There are no Request parameters required \n
 Response:
     Example
 ```
@@ -147,12 +147,12 @@ Request parameters: {question_id:int}
 Response:
     Example:
     
-    ```
+    
     {
         'success':True,
         'deleted': 30
     }
-    ```
+    
 
 Post /questions/search, search for questions matches with a string matches the search term
 Request parameters: {searchTerm;string}
