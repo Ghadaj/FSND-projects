@@ -125,7 +125,9 @@ Response:
 Get /questions, fetch all the available questions
 
 There are no Request parameters required
+
 Response:
+
     Example:
     
    ``` 
@@ -135,8 +137,11 @@ Response:
 
 
 Post /questions, add a new question
+
 Request parameters: {question:string, answer:string, difficulty: int, category:string}
+
 Response:
+
     Example
    ``` 
     {'success': True,
@@ -144,8 +149,11 @@ Response:
    ```     
 
 Delete '/questions/<question_id>, delete a question
+
 Request parameters: {question_id:int}
+
 Response:
+
     Example:
     
     
@@ -156,8 +164,11 @@ Response:
     
 
 Post /questions/search, search for questions matches with a string matches the search term
+
 Request parameters: {searchTerm;string}
+
 Response:
+
     Example:
 
  ```
@@ -165,16 +176,22 @@ Response:
  ```    
 
 Get /categories/<category_id>/questions, get all questions under specific category
+
 Request Parameters: {category_id:int}
+
 Response:
+
     Example:
  ```  
     {'currentCategory': '2', 'questions': [{'answer': 'Escher', 'category': 2, 'difficulty': 1, 'id': 16, 'question': 'Which Dutch graphic artist–initials M C was a creator of optical illusions?'}, {'answer': 'Mona Lisa', 'category': 2, 'difficulty': 3, 'id': 17, 'question': 'La Giaconda is better known as what?'}, {'answer': 'One', 'category': 2, 'difficulty': 4, 'id': 18, 'question': 'How many paintings did Van Gogh sell in his lifetime?'}, {'answer': 'Jackson Pollock', 'category': 2, 'difficulty': 2, 'id': 19, 'question': 'Which American artist was a pioneer of Abstract Expressionism, and a leading exponent of action painting?'}], 'success': True, 'totalQuestions': 4}
     
 ```
 Post /quizzes, fetch random questions under the selected category, one at a time.
+
 Request Parameters: {previous_questions:arr, quiz_category: {id:int, type:string}}}  
+
 Response:
+
     Example:
   ``` 
 {'question': {'answer': 'George Washington Carver', 'category': 4, 'difficulty': 2, 'id': 12, 'question': 'Who invented Peanut Butter?'}, 'success': True}
