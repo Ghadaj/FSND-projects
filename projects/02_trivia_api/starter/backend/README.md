@@ -137,10 +137,10 @@ Post /questions, add a new question
 Request parameters: {question:string, answer:string, difficulty: int, category:string}
 Response:
     Example
-    
+   ``` 
     {'success': True,
     'created' : 30}
-        
+   ```     
 
 Delete '/questions/<question_id>, delete a question
 Request parameters: {question_id:int}
@@ -173,6 +173,6 @@ Post /quizzes, fetch random questions under the selected category, one at a time
 Request Parameters: {previous_questions:arr, quiz_category: {id:int, type:string}}}  
 Response:
     Example:
-       ```
+   ```
 {'question': {'answer': 'George Washington Carver', 'category': 4, 'difficulty': 2, 'id': 12, 'question': 'Who invented Peanut Butter?'}, 'success': True}
     ```
