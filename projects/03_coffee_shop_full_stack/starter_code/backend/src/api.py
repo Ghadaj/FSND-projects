@@ -115,13 +115,29 @@ def unprocessable(error):
                     }), 404
 
 '''
-@app.errorhandler(404)
-def resource_not_found(error):
+  @app.errorhandler(400)
+  def error_400(e):
     return jsonify({
-                    "success": False, 
-                    "error": 404,
-                    "message": "resource not found"
-                    }), 404
+      'success': False,
+      'error': 400,
+      'message': "Bad Request"
+    }),400
+
+  @app.errorhandler(404)
+  def error_404(e):
+    return jsonify({
+      'success': False,
+      'error': 404,
+      'message': "Resource not found"
+    }),404
+
+  @app.errorhandler(500)
+  def error_500(e):
+    return jsonify({
+      'success': False,
+      'error': 500,
+      'message': "internal server error"
+    }),500
 
 '''
 @TODO implement error handler for 404
